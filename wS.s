@@ -1752,10 +1752,10 @@ createMatrix:
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, fp, lr}
 	add	fp, sp, #28
 	sub	sp, sp, #64
-	str	r0, [fp, #-72]
-	str	r1, [fp, #-76]
-	str	r2, [fp, #-80]
-	str	r3, [fp, #-84]
+	str	r0, [fp, #-72]		@(int n)
+	str	r1, [fp, #-76]		@(int numWords)
+	str	r2, [fp, #-80]		@(*words[numWords])
+	str	r3, [fp, #-84]		@(int wordCoordiantes[numWords][3])
 	ldr	r3, [fp, #-72]
 	add	r6, r3, #1
 	sub	r3, r6, #1
@@ -1769,7 +1769,7 @@ createMatrix:
 	mov	r4, r2, asl #3
 	mov	r3, sp
 	mov	r7, r3
-	ldr	r0, [fp, #-72]
+	ldr	r0, [fp, #-72]  	  @(
 	sub	r3, r0, #1
 	str	r3, [fp, #-48]
 	mov	r1, r0
@@ -1800,19 +1800,19 @@ createMatrix:
 	add	r3, r3, #7
 	mov	r3, r3, lsr #3
 	mov	r3, r3, asl #3
-	str	r3, [fp, #-52]
-	ldr	r2, [fp, #-52]
+	str	r3, [fp, #-52]  	 @ int usedRows[n];)
+	ldr	r2, [fp, #-52]  	 @(
 	mov	r3, r0
 	mov	r3, r3, asl #2
 	mov	r0, r2
 	mov	r1, #0
 	mov	r2, r3
-	bl	memset
-	mov	r3, #0
+	bl	memset          	@ memset (usedRows, 0, sizeof(usedRows));)
+	mov	r3, #0              	@i = 0;
 	str	r3, [fp, #-32]
 	b	.L84
 .L85:
-	ldr	r0, [fp, #-32]
+	ldr	r0, [fp, #-32]		@(
 	ldr	r1, [fp, #-72]
 	bl	__aeabi_idiv
 	mov	r3, r0
@@ -1826,22 +1826,22 @@ createMatrix:
 	bl	__aeabi_idivmod
 	mov	r3, r1
 	mov	r2, #48
-	strb	r2, [r4, r3]
-	ldr	r3, [fp, #-32]
+	strb	r2, [r4, r3]		@ grid[i/n][i%n] = ‘0’;
+	ldr	r3, [fp, #-32]		@(
 	add	r3, r3, #1
 	str	r3, [fp, #-32]
 .L84:
-	ldr	r3, [fp, #-72]
+	ldr	r3, [fp, #-72]		
 	ldr	r2, [fp, #-72]
 	mul	r2, r2, r3
 	ldr	r3, [fp, #-32]
 	cmp	r2, r3
-	bgt	.L85
-	mov	r3, #0
+	bgt	.L85			@ for (i = 0; i < n*n; i++))
+	mov	r3, #0			@ i = 0
 	str	r3, [fp, #-32]
 	b	.L86
 .L89:
-	mov	r3, #0
+	mov	r3, #0			@ int j = 0;
 	str	r3, [fp, #-36]
 	b	.L87
 .L88:
@@ -1859,22 +1859,22 @@ createMatrix:
 	add	r3, r3, #1
 	str	r3, [fp, #-36]
 .L87:
-	ldr	r3, [fp, #-36]
+	ldr	r3, [fp, #-36]		@(
 	cmp	r3, #2
-	ble	.L88
+	ble	.L88			@ for (j = 0; j < 3; j++))
 	ldr	r3, [fp, #-32]
 	add	r3, r3, #1
-	str	r3, [fp, #-32]
+	str	r3, [fp, #-32]		
 .L86:
-	ldr	r2, [fp, #-32]
+	ldr	r2, [fp, #-32]		@(
 	ldr	r3, [fp, #-76]
 	cmp	r2, r3
-	blt	.L89
-	mov	r3, #0
+	blt	.L89			@ for (i = 0; i < numWords; i++)
+	mov	r3, #0			@ i = 0;
 	str	r3, [fp, #-32]
 	b	.L90
 .L91:
-	mov	r3, r6
+	mov	r3, r6			@(
 	ldr	r2, [fp, #-32]
 	mul	r3, r2, r3
 	ldr	r2, [fp, #4]
@@ -1882,20 +1882,20 @@ createMatrix:
 	ldr	r3, [fp, #-72]
 	add	r3, r2, r3
 	mov	r2, #0
-	strb	r2, [r3, #0]
+	strb	r2, [r3, #0]		@ grid[i][n] = ‘/0’;
 	ldr	r3, [fp, #-32]
 	add	r3, r3, #1
 	str	r3, [fp, #-32]
 .L90:
-	ldr	r2, [fp, #-32]
+	ldr	r2, [fp, #-32]		@(
 	ldr	r3, [fp, #-72]
 	cmp	r2, r3
-	blt	.L91
-	mov	r3, #0
+	blt	.L91			@ for (i = 0; i < n; i++))
+	mov	r3, #0			@ i = 0;
 	str	r3, [fp, #-32]
-	b	.L92
+	b	.L92			
 .L99:
-	ldr	r3, [fp, #-32]
+	ldr	r3, [fp, #-32]		@(
 	mov	r3, r3, asl #2
 	ldr	r2, [fp, #-80]
 	add	r3, r2, r3
@@ -1903,19 +1903,19 @@ createMatrix:
 	mov	r0, r3
 	bl	strlen
 	mov	r3, r0
-	str	r3, [fp, #-56]
-	bl	rand
+	str	r3, [fp, #-56]		@ int wordLen = strlen(words[i]);
+	bl	rand			@(
 	mov	r2, r0
 	mov	r3, r2, asr #31
 	mov	r3, r3, lsr #31
 	add	r2, r2, r3
 	and	r2, r2, #1
 	rsb	r3, r3, r2
-	str	r3, [fp, #-60]
-	ldr	r3, [fp, #-60]
+	str	r3, [fp, #-60]		@ int reverse = rand() % 2;
+	ldr	r3, [fp, #-60]		@(
 	cmp	r3, #1
-	bne	.L93
-	ldr	r3, [fp, #-32]
+	bne	.L93			@ if (reverse == 1)
+	ldr	r3, [fp, #-32]		@(
 	mov	r3, r3, asl #2
 	ldr	r2, [fp, #-80]
 	add	r3, r2, r3
@@ -1936,9 +1936,9 @@ createMatrix:
 	mov	r0, r4
 	mov	r1, r2
 	mov	r2, r3
-	bl	strncpy
+	bl	strncpy                 @ strncpy(words[i], reverseString(wordLen + 1, words[i]), wordLen);
 .L93:
-	bl	rand
+	bl	rand                    @(
 	mov	r2, r0
 	ldr	r1, [fp, #-72]
 	ldr	r3, [fp, #-56]
@@ -1947,20 +1947,20 @@ createMatrix:
 	mov	r1, r3
 	bl	__aeabi_idivmod
 	mov	r3, r1
-	str	r3, [fp, #-64]
-	bl	rand
+	str	r3, [fp, #-64]          @ wordX = rand() % (n - wordLen);)
+	bl	rand                    @(
 	mov	r3, r0
 	mov	r0, r3
 	ldr	r1, [fp, #-72]
 	bl	__aeabi_idivmod
 	mov	r3, r1
-	str	r3, [fp, #-40]
-	ldr	r3, [fp, #-52]
+	str	r3, [fp, #-40]          @ wordY = rand() % n;)
+	ldr	r3, [fp, #-52]          @(
 	ldr	r2, [fp, #-40]
 	ldr	r3, [r3, r2, asl #2]
 	cmp	r3, #0
-	bne	.L103
-	mov	r3, r6
+	bne	.L103                   @ if (usedRows[wordY] == 0))
+	mov	r3, r6                  @(
 	ldr	r2, [fp, #-40]
 	mul	r2, r2, r3
 	ldr	r3, [fp, #-64]
@@ -1977,35 +1977,35 @@ createMatrix:
 	mov	r0, r1
 	mov	r1, r2
 	mov	r2, r3
-	bl	strncpy
-	ldr	r3, [fp, #-52]
+	bl	strncpy                 @ strncpy(&grid[wordY][wordX], words[i], wordLen);)
+	ldr 	r3, [fp, #-52]		@(
 	ldr	r2, [fp, #-40]
 	mov	r1, #1
-	str	r1, [r3, r2, asl #2]
+	str	r1, [r3, r2, asl #2]	@ usedRows = 1;
 	b	.L95
 .L97:
-	bl	rand
+	bl	rand                    @(
 	mov	r3, r0
 	mov	r0, r3
 	ldr	r1, [fp, #-72]
 	bl	__aeabi_idivmod
 	mov	r3, r1
 	str	r3, [fp, #-40]
-	b	.L96
+	b	.L96                    @ wordY = rand() % n;
 .L103:
 	mov	r0, r0	@ nop
 .L96:
-	ldr	r3, [fp, #-52]
+	ldr	r3, [fp, #-52]          @(
 	ldr	r2, [fp, #-40]
 	ldr	r3, [r3, r2, asl #2]
 	cmp	r3, #1
-	beq	.L97
-	ldr	r3, [fp, #-52]
+	beq	.L97                    @ while (usedRows[wordY] == 1))
+	ldr	r3, [fp, #-52]          @(
 	ldr	r2, [fp, #-40]
 	mov	r1, #1
-	str	r1, [r3, r2, asl #2]
+	str	r1, [r3, r2, asl #2]	@ usedRows[wordY] = 1;)
 .L95:
-	mov	r3, r6
+	mov	r3, r6			@(
 	ldr	r2, [fp, #-40]
 	mul	r2, r2, r3
 	ldr	r3, [fp, #-64]
@@ -2022,11 +2022,11 @@ createMatrix:
 	mov	r0, r1
 	mov	r1, r2
 	mov	r2, r3
-	bl	strncpy
-	ldr	r3, [fp, #-60]
+	bl	strncpy			@ strncpy(&grid[wordY][wordX], words[i], wordLen);)
+	ldr	r3, [fp, #-60]		@(
 	cmp	r3, #1
-	bne	.L98
-	ldr	r3, [fp, #-32]
+	bne	.L98			@ if (reverse == 1))
+	ldr	r3, [fp, #-32]		@(
 	mov	r3, r3, asl #2
 	ldr	r2, [fp, #-80]
 	add	r3, r2, r3
@@ -2047,9 +2047,9 @@ createMatrix:
 	mov	r0, r4
 	mov	r1, r2
 	mov	r2, r3
-	bl	strncpy
+	bl	strncpy         	@ strncpy(words[i], reverseString(wordLen + 1, words[i]), wordLen);)
 .L98:
-	ldr	r2, [fp, #-32]
+	ldr	r2, [fp, #-32]		@(
 	mov	r3, r2
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
@@ -2058,8 +2058,8 @@ createMatrix:
 	add	r3, r2, r3
 	ldr	r2, [fp, #-64]
 	add	r2, r2, #1
-	str	r2, [r3, #0]
-	ldr	r2, [fp, #-32]
+	str	r2, [r3, #0]		@ wordCoordinates[i][0] = wordX + 1;)
+	ldr	r2, [fp, #-32]		@(
 	mov	r3, r2
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
@@ -2068,20 +2068,20 @@ createMatrix:
 	add	r3, r2, r3
 	ldr	r2, [fp, #-40]
 	add	r2, r2, #1
-	str	r2, [r3, #4]
-	ldr	r3, [fp, #-32]
+	str	r2, [r3, #4]		@ wordCoordinates[i][1] = wordY + 1;)
+	ldr	r3, [fp, #-32]		@(
 	add	r3, r3, #1
-	str	r3, [fp, #-32]
+	str	r3, [fp, #-32]		@ i++); (WHILE LOOP)
 .L92:
-	ldr	r2, [fp, #-32]
+	ldr	r2, [fp, #-32]		@(
 	ldr	r3, [fp, #-76]
 	cmp	r2, r3
-	blt	.L99
+	blt	.L99			@ for (i = 0; i < numWords; i++))
 	mov	r3, #0
 	str	r3, [fp, #-32]
 	b	.L100
 .L102:
-	ldr	r0, [fp, #-32]
+	ldr	r0, [fp, #-32]		@(
 	ldr	r1, [fp, #-72]
 	bl	__aeabi_idiv
 	mov	r3, r0
@@ -2094,10 +2094,10 @@ createMatrix:
 	ldr	r1, [fp, #-72]
 	bl	__aeabi_idivmod
 	mov	r3, r1
-	ldrb	r3, [r4, r3]	@ zero_extendqisi2
+	ldrb	r3, [r4, r3]		@ zero_extendqisi2
 	cmp	r3, #48
-	bne	.L101
-	ldr	r0, [fp, #-32]
+	bne	.L101			@ if (grid[i/n][i%n] == ‘0’))
+	ldr	r0, [fp, #-32]		@(
 	ldr	r1, [fp, #-72]
 	bl	__aeabi_idiv
 	mov	r3, r0
@@ -2127,7 +2127,7 @@ createMatrix:
 	uxtb	r3, r2
 	add	r3, r3, #97
 	uxtb	r3, r3
-	strb	r3, [r5, r4]
+	strb	r3, [r5, r4]		@ grid[i/n][i%n] = ‘a’ + rand() % (‘z’ - ‘a’);)
 .L101:
 	ldr	r3, [fp, #-32]
 	add	r3, r3, #1
