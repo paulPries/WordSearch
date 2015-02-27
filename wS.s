@@ -98,50 +98,57 @@ playAgain:
 	.global	displayInfo
 	.type	displayInfo, %function
 displayInfo:
+	/* COMMENTATOR CARTER COOK
+	#-12 == result
+	#-16 == maxScore
+	#-20 == numMistakes
+	#-24 == score
+	#-28 == numWords
+	*/
 	@ args = 0, pretend = 0, frame = 24
 	@ frame_needed = 1, uses_anonymous_args = 0
 	stmfd	sp!, {fp, lr}
 	add	fp, sp, #4
 	sub	sp, sp, #32
-	str	r0, [fp, #-24]
-	str	r1, [fp, #-28]
-	ldr	r3, .L10
+	str	r0, [fp, #-24]	@store score param
+	str	r1, [fp, #-28]	@store numWords param
+	ldr	r3, .L10		@(printf("Enter your name: ");
 	mov	r0, r3
-	bl	printf
-	ldr	r3, .L10+4
+	bl	printf			@)
+	ldr	r3, .L10+4		@(int result = scanf("%s\n", name);
 	mov	r0, r3
 	ldr	r1, [fp, #-8]
 	bl	__isoc99_scanf
-	str	r0, [fp, #-12]
-	ldr	r3, [fp, #-12]
+	str	r0, [fp, #-12]	@)
+	ldr	r3, [fp, #-12]	@(if (result != 1)
 	cmp	r3, #1
-	beq	.L9
-	ldr	r0, .L10+8
-	bl	puts
-	mov	r0, #1
-	bl	exit
+	beq	.L9				@)
+	ldr	r0, .L10+8		@(printf("Incorrect input, exiting. \n");
+	bl	puts			@)
+	mov	r0, #1			@(exit(1);
+	bl	exit			@)
 .L9:
-	ldr	r2, [fp, #-28]
+	ldr	r2, [fp, #-28]	@(int maxScore = numWords * 5;
 	mov	r3, r2
 	mov	r3, r3, asl #2
 	add	r3, r3, r2
-	str	r3, [fp, #-16]
-	ldr	r2, [fp, #-16]
+	str	r3, [fp, #-16]	@)
+	ldr	r2, [fp, #-16]	@(int numMistakes = (maxScore - score)/3;
 	ldr	r3, [fp, #-24]
 	rsb	r3, r3, r2
 	ldr	r2, .L10+12
-	smull	r1, r2, r2, r3
+	smull	r1, r2, r2, r3	@SMULL = LONG SIGNED MULTIPLY, stores 64 bit product operands 1 & 2
 	mov	r3, r3, asr #31
 	rsb	r3, r3, r2
-	str	r3, [fp, #-20]
-	ldr	r3, .L10+16
+	str	r3, [fp, #-20]	@)
+	ldr	r3, .L10+16		@(printf("Hello %s, your final score was %d out of a possible %d. You made %d mistakes.\n", name, score, maxScore, numMistakes);
 	ldr	r2, [fp, #-20]
 	str	r2, [sp, #0]
 	mov	r0, r3
 	ldr	r1, [fp, #-8]
 	ldr	r2, [fp, #-24]
 	ldr	r3, [fp, #-16]
-	bl	printf
+	bl	printf			@)
 	sub	sp, fp, #4
 	ldmfd	sp!, {fp, pc}
 .L11:
@@ -994,47 +1001,53 @@ getSize:
 	.global	getNumWords
 	.type	getNumWords, %function
 getNumWords:
+	/* COMMENTS: CARTER COOK
+	#-8 == result
+	#-12 == size
+	#-16 == min
+	#-20 == max
+	*/
 	@ args = 0, pretend = 0, frame = 16
 	@ frame_needed = 1, uses_anonymous_args = 0
 	stmfd	sp!, {fp, lr}
 	add	fp, sp, #4
 	sub	sp, sp, #16
-	str	r0, [fp, #-16]
-	str	r1, [fp, #-20]
-	mov	r3, #0
-	str	r3, [fp, #-12]
-	ldr	r3, .L34
+	str	r0, [fp, #-16]	@store min param
+	str	r1, [fp, #-20]	@store max param
+	mov	r3, #0			@(@int size = 0;
+	str	r3, [fp, #-12]	@)
+	ldr	r3, .L34		@(printf("Enter the number of words you wish to search for between %d and %d: ", min, max);
 	mov	r0, r3
 	ldr	r1, [fp, #-16]
 	ldr	r2, [fp, #-20]
-	bl	printf
-	ldr	r2, .L34+4
-	sub	r3, fp, #12
+	bl	printf			@)
+	ldr	r2, .L34+4		@(int result = scanf("%d", &size);
+	sub	r3, fp, #12		
 	mov	r0, r2
 	mov	r1, r3
 	bl	__isoc99_scanf
-	str	r0, [fp, #-8]
-	ldr	r3, [fp, #-8]
+	str	r0, [fp, #-8]	@)
+	ldr	r3, [fp, #-8]	@(if (result != 1)
 	cmp	r3, #1
-	beq	.L33
-	ldr	r0, .L34+8
-	bl	puts
-	mov	r0, #1
-	bl	exit
-.L32:
-	ldr	r3, .L34+12
+	beq	.L33			@)
+	ldr	r0, .L34+8		@(printf("Incorrect input, exiting…\n");
+	bl	puts			@)
+	mov	r0, #1			@(exit(1);
+	bl	exit			@)
+.L32:					@while loop contents:
+	ldr	r3, .L34+12		@(printf("You have already found that word, please try again: ");
 	mov	r0, r3
-	bl	printf
-	ldr	r2, .L34+4
+	bl	printf			@)
+	ldr	r2, .L34+4		@(result = scanf("%d", &wordNum);
 	sub	r3, fp, #12
 	mov	r0, r2
 	mov	r1, r3
 	bl	__isoc99_scanf
-	str	r0, [fp, #-8]
+	str	r0, [fp, #-8]	@)
 	b	.L31
 .L33:
 	mov	r0, r0	@ nop
-.L31:
+.L31:					@(while (size < min || size > max)
 	ldr	r2, [fp, #-12]
 	ldr	r3, [fp, #-16]
 	cmp	r2, r3
@@ -1042,11 +1055,11 @@ getNumWords:
 	ldr	r2, [fp, #-12]
 	ldr	r3, [fp, #-20]
 	cmp	r2, r3
-	bgt	.L32
-	ldr	r3, [fp, #-12]
+	bgt	.L32			@)
+	ldr	r3, [fp, #-12]	@(return size;
 	mov	r0, r3
-	sub	sp, fp, #4
-	ldmfd	sp!, {fp, pc}
+	sub	sp, fp, #4		
+	ldmfd	sp!, {fp, pc}	@)
 .L35:
 	.align	2
 .L34:
@@ -2138,34 +2151,42 @@ createMatrix:
 	.global	main
 	.type	main, %function
 main:
+	/* CARTER COOK CAN COMMENT
+	#-44 == i
+	#-48 == n
+	#-52 == numWords
+	#-60 == words
+	#-68 == wordCoordinates
+	#-80 == finalArray
+	*/
 	@ args = 0, pretend = 0, frame = 80
 	@ frame_needed = 1, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
 	add	fp, sp, #32
 	sub	sp, sp, #92
-	mov	r3, #1
-	str	r3, [fp, #-40]
+	mov	r3, #1			@(int replay = 1
+	str	r3, [fp, #-40]	@)
 	b	.L107
 .L110:
-	mov	r3, sp
+	mov	r3, sp			@while loop setup stuff
 	mov	sl, r3
-	bl	getSize
-	str	r0, [fp, #-48]
-	ldr	r2, [fp, #-48]
-	mov	r3, r2, lsr #31
+	bl	getSize			@(int n = getSize
+	str	r0, [fp, #-48]	@)
+	ldr	r2, [fp, #-48]	@(int numWords = getNumWords(n/2, n);
+	mov	r3, r2, lsr #31	@divide n by 2 using shifts
 	add	r3, r3, r2
 	mov	r3, r3, asr #1
 	mov	r0, r3
-	ldr	r1, [fp, #-48]
+	ldr	r1, [fp, #-48]	@load n
 	bl	getNumWords
-	str	r0, [fp, #-52]
-	mov	r0, #0
+	str	r0, [fp, #-52]	@)
+	mov	r0, #0			@(srand(time(NULL));
 	bl	time
 	mov	r3, r0
 	mov	r0, r3
 	bl	srand
-	ldr	r0, [fp, #-52]
-	sub	r3, r0, #1
+	ldr	r0, [fp, #-52]	@(char *words[numWords];
+	sub	r3, r0, #1		@compensate for 0 based indexing
 	str	r3, [fp, #-56]
 	mov	r1, r0
 	mov	r2, r1
@@ -2197,34 +2218,34 @@ main:
 	mov	r3, r3, lsr #3
 	mov	r3, r3, asl #3
 	str	r3, [fp, #-60]
-	mov	r3, #0
-	str	r3, [fp, #-44]
+	mov	r3, #0			@(int i;
+	str	r3, [fp, #-44]	@)
 	b	.L108
 .L109:
-	ldr	r3, [fp, #-48]
-	add	r3, r3, #1
+	ldr	r3, [fp, #-48]	@(words[i] = malloc((n+1) * sizeof(char));
+	add	r3, r3, #1		@load n+1
 	mov	r0, r3
 	bl	malloc
 	mov	r3, r0
-	mov	r1, r3
-	ldr	r3, [fp, #-60]
-	ldr	r2, [fp, #-44]
-	str	r1, [r3, r2, asl #2]
+	mov	r1, r3			@r1 holds returned pointer from malloc
+	ldr	r3, [fp, #-60]	@load i
+	ldr	r2, [fp, #-44]	@load words
+	str	r1, [r3, r2, asl #2]	@)
 	ldr	r3, [fp, #-44]
-	add	r3, r3, #1
+	add	r3, r3, #1		@i++
 	str	r3, [fp, #-44]
 .L108:
-	ldr	r2, [fp, #-44]
+	ldr	r2, [fp, #-44]	@(for (i=0; i < n; i++)
 	ldr	r3, [fp, #-48]
 	cmp	r2, r3
-	blt	.L109
-	ldr	r3, [fp, #-60]
-	ldr	r0, [fp, #-48]
-	ldr	r1, [fp, #-52]
-	mov	r2, r3
-	bl	getWords
-	ldr	lr, [fp, #-52]
-	mov	r3, sp
+	blt	.L109			@)
+	ldr	r3, [fp, #-60]	@(getWords(n, numWords, words);
+	ldr	r0, [fp, #-48]	@load n
+	ldr	r1, [fp, #-52]	@load numWords
+	mov	r2, r3			@load words
+	bl	getWords		@)
+	ldr	lr, [fp, #-52]	@(int wordCoordinates[numWords][3];
+	mov	r3, sp			@enter confusing 2D array declaration land
 	mov	r7, r3
 	sub	r3, lr, #1
 	str	r3, [fp, #-64]
@@ -2237,7 +2258,7 @@ main:
 	mul	r3, r3, r0
 	add	ip, r2, r3
 	mov	r3, #96
-	umull	r2, r3, r0, r3
+	umull	r2, r3, r0, r3	@UMULL = LONG UNSIGNED MULTIPLY, stores 64 bit product operands 1 & 2
 	add	r1, ip, r3
 	mov	r3, r1
 	mov	r2, lr
@@ -2271,9 +2292,9 @@ main:
 	add	r3, r3, #7
 	mov	r3, r3, lsr #3
 	mov	r3, r3, asl #3
-	str	r3, [fp, #-68]
-	ldr	r3, [fp, #-48]
-	add	lr, r3, #1
+	str	r3, [fp, #-68]	@)
+	ldr	r3, [fp, #-48]	@(char finalArray[n][n+1];
+	add	lr, r3, #1		@see you in 76 lines...
 	ldr	r6, [fp, #-48]
 	sub	r3, lr, #1
 	str	r3, [fp, #-72]
@@ -2341,45 +2362,45 @@ main:
 	add	r3, sp, #8
 	add	r3, r3, #7
 	mov	r3, r3, lsr #3
-	mov	r3, r3, asl #3
-	str	r3, [fp, #-80]
-	ldr	r2, [fp, #-60]
-	ldr	ip, [fp, #-68]
-	ldr	r3, [fp, #-80]
+	mov	r3, r3, asl #3	@)
+	str	r3, [fp, #-80]	@(createMatrix(n, numWords, words, wordCoordinates, finalArray);
+	ldr	r2, [fp, #-60]	@load words
+	ldr	ip, [fp, #-68]	@load wordCoordinates
+	ldr	r3, [fp, #-80]	@load finalArray
 	str	r3, [sp, #0]
-	ldr	r0, [fp, #-48]
-	ldr	r1, [fp, #-52]
+	ldr	r0, [fp, #-48]	@load n
+	ldr	r1, [fp, #-52]	@load numWords
 	mov	r3, ip
-	bl	createMatrix
-	ldr	r3, [fp, #-80]
+	bl	createMatrix	@)
+	ldr	r3, [fp, #-80]	@(printGrid(n, finalArray);
 	ldr	r0, [fp, #-48]
 	mov	r1, r3
-	bl	printGrid
-	ldr	r3, [fp, #-60]
+	bl	printGrid		@)
+	ldr	r3, [fp, #-60]	@(printKey(numWords, n, words);
 	ldr	r0, [fp, #-52]
 	ldr	r1, [fp, #-48]
 	mov	r2, r3
-	bl	printKey
-	ldr	r3, [fp, #-68]
+	bl	printKey		@)
+	ldr	r3, [fp, #-68]	@(int score = playGame(numWords, n, wordCoordinates, words); 
 	ldr	ip, [fp, #-60]
 	ldr	r0, [fp, #-52]
 	ldr	r1, [fp, #-48]
 	mov	r2, r3
 	mov	r3, ip
 	bl	playGame
-	str	r0, [fp, #-84]
-	ldr	r0, [fp, #-84]
+	str	r0, [fp, #-84]	@)
+	ldr	r0, [fp, #-84]	@(displayInfo(score, numWords);)
 	ldr	r1, [fp, #-52]
-	bl	displayInfo
-	bl	playAgain
+	bl	displayInfo		@)
+	bl	playAgain		@(replay = playAgain();
 	str	r0, [fp, #-40]
 	mov	sp, r7
-	mov	sp, sl
-.L107:
+	mov	sp, sl			@)
+.L107:					@(while (replay == 1)
 	ldr	r3, [fp, #-40]
 	cmp	r3, #1
-	beq	.L110
-	mov	r3, #0
+	beq	.L110			@)
+	mov	r3, #0			@(return 0;
 	mov	r0, r3
 	sub	sp, fp, #32
 	ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
