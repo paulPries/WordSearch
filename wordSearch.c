@@ -3,6 +3,12 @@
 #include <string.h>
 #include <time.h>
 
+/*
+ Annie's Function
+ playAgain Function:
+ user input to play the wordsearch again
+ or else exiting the game
+ */
 int playAgain(){
   char input;
   printf("Would you like to play again?(y/n) ");
@@ -78,7 +84,7 @@ void getWords(int size,int numWords,char *words[numWords]) {
   }
 }
 
-//ANNIE
+
 int getSize(){
   int size = 0; 
   printf("Enter a matrix size between 10-20: ");
@@ -95,6 +101,12 @@ int getSize(){
   return size; 
 }
 
+/*
+  Annie's Function
+  getNumWords Function:
+  input the range below the size of matrix
+  else error and exit
+ */
 int getNumWords(int min, int max){
   int size = 0;
   printf("Enter the number of words you wish to search for between %d and %d: ", min, max);
@@ -128,7 +140,11 @@ void printGrid(int size, char grid[size][size+1]) {
   }
 }
 
-//ANNIE
+/*
+  Annie's Function
+  printKey Function:
+  print out the random select words as key for user to search in matrix
+ */
 void printKey(int numWords, int n, char *words[numWords]){
   int i;
   printf("\nWORD KEY:\n");
@@ -163,7 +179,11 @@ int checkWordsRemain(int numWords, int wordCoordinates[numWords][3]){
   return wordNum;
 }
 
-//NEW FUNCTION FOR SOMEONE
+/*
+  Annie's Function
+  checkFinished Function:
+  when the words is all found and exit
+ */
 int checkFinished(int numWords, int wordCoordinates[numWords][3]){
   int gameDone = 1; 
   int i; 
